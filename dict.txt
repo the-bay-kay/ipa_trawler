@@ -1,3 +1,6 @@
 penguin
+10th
+-a
+A
 dog
 alskdjafs

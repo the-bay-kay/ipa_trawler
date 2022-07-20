@@ -8,23 +8,30 @@ OUTFILE="US_English_IPA.dict"
 touch $OUTFILE
 
 while read -r line;
-do
+do 
+    test="${line//[^0-9]/}"
     url="${LINK}$line"
     f_path="/tmp/${line}-ipa_trawler.txt"
     wget --quiet $url -O $f_path
     err=$(cat $f_path | grep 'home')
     # If dictionary entry doesn't exist, reroutes to homepag
-    if ! [ -z "$err" ];
+    if ! [ -z "$err" ] || ! [ -z $test ];
     then
         >&2 echo "    [!] ${line} Not Found"
         continue
     fi
     # This temp readline is janky, BUT IT WORKS B)
     tmp=$(cat $f_path | grep 'ipa' | { read l_1; read l_2; echo $l_2 ; })
-    tmp=${tmp:68}
-    tmp=${tmp::-50}
-    output="${line} ${tmp}"
+    if [ -z "$tmp" ];
+    then
+        >&2 echo "    [!] ${line} Not Found"
+        continue
+    fi
+    re='s|<[^>]*>||g'
+    re2='s/\s.*$//'
+    tmp=$(echo $tmp | sed $re | sed $re2)
+    output="${line} ${tmp///}"
     echo $output >> $OUTFILE
-    >&1 echo "${line}"
+    echo "+ $line"
     rm $f_path
 done <$DICT_PATH
