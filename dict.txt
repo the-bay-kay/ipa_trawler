@@ -1,6 +1,4 @@
-penguin
-10th
--a
-A
+abandon
+asldk
 dog
-alskdjafs
+cat

@@ -1,21 +1,23 @@
 #!/usr/bin/bash
 
-# DICT_PATH="/usr/share/dict/linux.words"
-DICT_PATH="/home/katie/Documents/scripts/ipa_trawler/dict.txt"
+DICT_PATH="/usr/share/dict/linux.words"
+# DICT_PATH="/home/katie/Documents/scripts/ipa_trawler/dict.txt"
 LINK="https://dictionary.cambridge.org/dictionary/english/"
 OUTFILE="US_English_IPA.dict"
-# Outfile setup
+
+
+# IO setup
 touch $OUTFILE
 
+# Begin Trawling
 while read -r line;
 do 
-    test="${line//[^0-9]/}"
     url="${LINK}$line"
     f_path="/tmp/${line}-ipa_trawler.txt"
     wget --quiet $url -O $f_path
-    err=$(cat $f_path | grep 'home')
+    err=$(cat $f_path | grep 'Home page for English Dictionary')
     # If dictionary entry doesn't exist, reroutes to homepag
-    if ! [ -z "$err" ] || ! [ -z $test ];
+    if ! [ -z "$err" ];
     then
         >&2 echo "    [!] ${line} Not Found"
         continue
@@ -35,3 +37,4 @@ do
     echo "+ $line"
     rm $f_path
 done <$DICT_PATH
+
